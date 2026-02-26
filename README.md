@@ -1,155 +1,226 @@
-
-
-```markdown
 # Bol.AI 🎙️
 
 **Speak with confidence.**
-Bol.AI is a real-time, interactive English fluency coach built for Pakistan. It leverages Google's Gemini Multimodal Live API to provide instant, conversational feedback through low-latency WebSockets.
+Bol.AI is a real-time, interactive English fluency coach built for Pakistan. It provides instant, conversational feedback using low-latency WebSockets and native audio streaming.
 
 ---
 
-## 🚀 Project Status: What is built so far?
+## 🚀 Project Status
 
-**Frontend (React Native / Expo SDK 54):**
-* **UI/UX:** Core screens are implemented (Get Started, Dashboard, Tab layout).
-* **Authentication:** Fully working Google OAuth integration via Supabase. 
-* **Native Infrastructure:** Upgraded from standard "Expo Go" to a Custom Native Development Build to support raw file system access and high-fidelity native audio streaming.
+### Frontend (React Native / Expo SDK 54)
 
-**Backend (Python / FastAPI):**
-* **Architecture:** Uvicorn server setup with CORS middleware configured for React Native.
-* **WebSocket Tunnel:** Bi-directional streaming route (`/gemini/ws/chat`) established to pipe audio directly to the Gemini 2.5 Flash model.
+* **UI/UX:** Core screens implemented (Get Started, Dashboard, Tabs).
+* **Authentication:** Google OAuth fully integrated via Supabase.
+* **Native Capabilities:** Uses a custom Expo Development Build (not Expo Go) to support raw file system access and high-quality native audio streaming.
+
+### Backend (Python / FastAPI)
+
+* **Architecture:** FastAPI application served with Uvicorn and CORS enabled for mobile clients.
+* **Real-time Streaming:** Bi-directional WebSocket route (`/gemini/ws/chat`) for live audio streaming to the AI model.
 
 ---
 
 ## 🛠️ Tech Stack
-* **Frontend:** React Native, Expo, TypeScript, Tailwind CSS (NativeWind)
+
+* **Frontend:** React Native, Expo, TypeScript, NativeWind (Tailwind CSS)
 * **Backend:** Python 3.x, FastAPI, Uvicorn, WebSockets
-* **Database/Auth:** Supabase
-* **AI:** Google Gemini 2.5 Flash (Native Audio)
+* **Auth & Database:** Supabase
+* **AI:** Google Gemini 2.5 Flash (native audio)
 
 ---
 
 ## ⚙️ Local Development Setup
 
-Because this app uses native hardware features (microphone, raw audio streaming), **you cannot simply use the standard Expo Go app to test the core AI features.** You will need to run a "Development Build". 
+⚠️ **Important:** This project uses native device features (microphone, raw audio streaming). **Expo Go cannot be used to test core AI features.** You must run a **Development Build**.
 
-Please follow these instructions strictly in order.
-
-### Part 1: Start the Python Backend
-
-1. **Open a terminal** and navigate to the backend folder:
-   ```bash
-   cd backend
-
-```
-
-2. **Create a virtual environment** (so you don't mess up your global Python installation):
-```bash
-python -m venv venv
-
-```
-
-
-3. **Activate the environment:**
-* *Windows:* `venv\Scripts\activate`
-* *Mac/Linux:* `source venv/bin/activate`
-
-
-4. **Install the dependencies:**
-```bash
-pip install -r requirements.txt
-
-```
-
-
-5. **Set up Environment Variables:**
-* Create a file named `.env` in the `backend` folder.
-* Add your Google API key and Supabase keys.
-* *CRITICAL:* Do not use quotes or spaces!
-```env
-GOOGLE_API_KEY=AIzaSyYourKeyHere...
-SUPABASE_URL=[https://your-project.supabase.co](https://your-project.supabase.co)
-SUPABASE_ANON_KEY=eyJhb...
-
-```
-
-
-
-
-6. **Start the server:**
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000 --env-file .env
-
-```
-
-
+Follow the steps below **in order**.
 
 ---
 
-### Part 2: Start the React Native Frontend
+## Part 1: Backend Setup (FastAPI)
 
-Open a **new** terminal window and navigate to the frontend folder:
+1. Open a terminal and navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+2. Create a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+3. Activate the virtual environment:
+
+* **Windows:**
+
+```bash
+venv\Scripts\activate
+```
+
+* **macOS / Linux:**
+
+```bash
+source venv/bin/activate
+```
+
+4. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+5. Create a `.env` file inside the `backend` folder:
+
+```env
+GOOGLE_API_KEY=AIzaSyYourKeyHere
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=eyJhb...
+```
+
+⚠️ **Rules:**
+
+* No quotes
+* No extra spaces
+* Never commit this file
+
+6. Start the backend server:
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000 --env-file .env
+```
+
+The backend should now be running on:
+
+```
+http://0.0.0.0:8000
+```
+
+---
+
+## Part 2: Frontend Setup (Expo / React Native)
+
+Open a **new terminal window**.
+
+1. Navigate to the frontend folder:
 
 ```bash
 cd frontend
 npm install
-
 ```
 
-**Set up Frontend Environment Variables:**
-Create a `.env` file in the `frontend` folder and add your Supabase keys:
+2. Create a `.env` file in the `frontend` folder:
 
 ```env
-EXPO_PUBLIC_SUPABASE_URL=[https://your-project.supabase.co](https://your-project.supabase.co)
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhb...
-
 ```
-
-#### Method A: The Quick UI Test (Expo Go)
-
-*Use this ONLY if you are designing UI elements (buttons, colors, text). Native audio and file systems will crash here.*
-
-1. Download the **Expo Go** app on your physical iPhone or Android.
-2. Run this command in your terminal:
-```bash
-npx expo start
-
-```
-
-
-3. Scan the QR code with your phone's camera.
-
-#### Method B: The Full App (Development Build) ⭐️ REQUIRED FOR AI FEATURES ⭐️
-
-*Use this to test the actual application, Google Login, and Gemini Audio.*
-
-**Prerequisites for Windows/Android:**
-
-* You must have **Java 17** installed.
-* You must have Android Studio installed to get the Android SDK.
-* Your `ANDROID_HOME` and `JAVA_HOME` environment variables MUST be set in your Windows System Properties.
-
-**Steps to Build:**
-
-1. Plug your physical Android phone into your laptop via USB.
-2. Ensure **"USB Debugging"** is turned ON in your phone's Developer Options.
-3. Run the build command:
-```bash
-npx expo run:android
-
-```
-
-
-*(Note: The first time you run this, it will take 10–20 minutes to download Gradle and compile the C++/Java code. Be patient. Subsequent builds take seconds).*
-4. Once finished, a custom `Bol.AI` app icon will appear on your phone. Open it, and it will automatically connect to your laptop's server!
 
 ---
 
-## 🚨 Common Troubleshooting for Teammates
+## Running the App
 
-* **Google Login Loops Back to Start:** Ensure your `login.tsx` redirect URI is set to `scheme: 'frontend'` and that `frontend://` is added to your Supabase Authentication URL Configuration dashboard.
-* **WebSocket Connection Refused:** The frontend needs to know where your backend is. Open a command prompt, type `ipconfig`, find your laptop's **IPv4 Address** (e.g., `192.168.0.104`), and update the `wsUrl` inside `frontend/hooks/useGeminiLive.ts`.
-* **SDK Not Found Error:** Restart your VS Code and terminal so it can read your newly added `ANDROID_HOME` variable.
+### Method A: Expo Go (UI Only)
 
+✅ Use this **only** for UI work (layouts, colors, text).
+
+❌ Audio streaming, file system access, and AI features will fail.
+
+1. Install **Expo Go** on your phone.
+2. Run:
+
+```bash
+npx expo start
 ```
 
+3. Scan the QR code.
+
+---
+
+### Method B: Development Build ⭐ REQUIRED ⭐
+
+Use this method to test:
+
+* Google Login
+* Audio recording
+* Real-time Gemini interaction
+
+#### Android (Windows)
+
+**Prerequisites:**
+
+* Java 17 installed
+* Android Studio installed
+* ANDROID_HOME and JAVA_HOME set in System Environment Variables
+
+**Steps:**
+
+1. Connect your physical Android device via USB.
+2. Enable **Developer Options → USB Debugging**.
+3. Run:
+
+```bash
+npx expo run:android
+```
+
+⏳ First build may take 10–20 minutes. This is normal.
+
+4. A custom **Bol.AI** app will install on your phone.
+5. Open the app — it will automatically connect to your local dev server.
+
+---
+
+## 🚨 Common Troubleshooting
+
+### Google Login Redirects Back to Start
+
+* Ensure the redirect scheme in `login.tsx` is:
+
+```ts
+scheme: 'frontend'
+```
+
+* Add the following to Supabase Auth → URL Configuration:
+
+```
+frontend://
+```
+
+### WebSocket Connection Refused
+
+* Find your laptop's local IP address:
+
+```bash
+ipconfig
+```
+
+* Example: `192.168.0.104`
+* Update the WebSocket URL in:
+
+```
+frontend/hooks/useGeminiLive.ts
+```
+
+### Android SDK / Java Not Found
+
+* Restart VS Code and all terminals
+* Confirm ANDROID_HOME and JAVA_HOME are correctly set
+
+---
+
+## 📌 Note
+
+* Always start the **backend first**
+* Use **Development Build**, not Expo Go, for real testing
+* Keep phone and laptop on the **same Wi-Fi network**
+
+---
+
+## 📄 License
+
+Will be protected
+
+---
+
+Happy building 🚀
